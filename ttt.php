@@ -2,6 +2,8 @@
 
     function main() {
 
+        echo '<h1>Tic-Tac-Toe</h1>';
+
         if (isset($_GET['name'])) {
             $name = htmlspecialchars($_GET['name']);
             $date = date("m-d-Y");
@@ -17,7 +19,7 @@
         }
         else {
             echo '
-                <form action="ttt.php" method="get">
+                <form class="name" action="ttt.php" method="get">
                     <label for="name">Enter your name:</label>
                     <input type="text" name="name" id="name" required>
                     <input type="submit" value="Submit">
@@ -36,15 +38,17 @@
             echo '<tr>';
             for($j = 0; $j < 3; $j++) {
                 $cell_value = $board_values[$i * 3 + $j];
-                if ($cell_value == "") {
+                echo '<td>';
+                if ($cell_value == "" && $winner == null) {
                     $board_if_clicked = $board_values;
                     $board_if_clicked[$i * 3 + $j] = 'X';
                     $board_if_clicked[find_best_move($board_if_clicked)] = 'O';
-                    echo '<td><a href="ttt.php?name=' . $_GET['name'] . '&board=' . urlencode(implode(" ", $board_if_clicked)) . '"> </a></td>';
+                    echo '<a href="ttt.php?name=' . $_GET['name'] . '&board=' . urlencode(implode(" ", $board_if_clicked)) . '"> </a>';
                 }
                 else {
-                    echo '<td>' . $cell_value . '</td>';
+                    echo $cell_value;
                 }
+                echo '</td>';
             }
             echo '</tr>';
         }
@@ -61,7 +65,7 @@
                 echo "<h2>WINNER: NONE. A STRANGE GAME. THE ONLY WINNING MOVE IS NOT TO PLAY.</h2>";
             }
             echo '
-                <form action="ttt.php" method="get">
+                <form class="play_again" action="ttt.php" method="get">
                     <input type="hidden" name="name" value="' . $_GET['name'] . '">
                     <input type="submit" value="Play Again">
                 </form>
