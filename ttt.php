@@ -31,7 +31,6 @@
     function generate_board($board_values) {
 
         $winner = check_win($board_values);
-        $arrlen = count($board_values);
 
         echo '<table>';
         for($i = 0; $i < 3; $i++) {
