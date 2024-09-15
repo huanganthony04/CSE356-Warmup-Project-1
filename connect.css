@@ -51,18 +51,8 @@ button:hover {
     background-color: #4cae4c;
 }
 
-button:disabled {
-    background-color: #a1b1a1;
-    cursor: not-allowed;
-}
-
 input[type="submit"]:hover {
     background-color: #4cae4c;
-}
-
-input[type="submit"]:disabled {
-    background-color: #a1b1a1;
-    cursor: not-allowed;
 }
 
 table {

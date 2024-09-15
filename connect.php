@@ -2,8 +2,8 @@
     function main() {
         echo '<h1>Connect Four</h1>';
 
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
+        if (isset($_POST['name'])) {
+            $name = $_POST['name'];
             $date = date("m-d-Y");
             echo "<h1>Hello $name, $date</h1>";
             if(isset($_POST['board'])) {
@@ -30,7 +30,7 @@
         }
         else {
             echo '
-                <form class="name" action="connect.php" method="get">
+                <form class="name" action="connect.php" method="post">
                     <label for="name">Enter your name:</label>
                     <input type="text" name="name" id="name" required>
                     <input type="submit" value="Submit">
@@ -91,16 +91,10 @@
                     $board_str .= implode(" ", $row) . ".";
                 }
                 echo '
-                    <form action="connect.php?name=' . $_GET['name'] . '" method="post">
+                    <form action="connect.php" method="post">
+                        <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
                         <input type="hidden" name="board" id="board" value="' . $board_str . '">
                         <button type="submit">Drop</button>
-                    </form>
-                ';
-            }
-            else {
-                echo '
-                    <form class="drop">
-                        <button type="submit" disabled>Drop</button>
                     </form>
                 ';
             }
@@ -130,7 +124,8 @@
                 echo "<h2>Draw!</h2>";
             }
             echo '
-                <form class="play_again" action="connect.php?name=' . $_GET['name'] . '" method="post">
+                <form class="play_again" action="connect.php" method="post">
+                    <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
                     <input type="hidden" name="board" id="board" value=" . . . . ">
                     <button type="submit">Play Again</button>
                 </form>
