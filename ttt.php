@@ -63,12 +63,15 @@
             else if ($winner == 'Tie') {
                 echo "<h2>WINNER: NONE. A STRANGE GAME. THE ONLY WINNING MOVE IS NOT TO PLAY.</h2>";
             }
-            echo '
-                <form class="play_again" action="ttt.php" method="get">
-                    <input type="hidden" name="name" value="' . $_GET['name'] . '">
-                    <input type="submit" value="Play Again">
-                </form>
-            ';
+
+            if($winner != 'Tie') {
+                echo '
+                    <form class="play_again" action="ttt.php" method="get">
+                        <input type="hidden" name="name" value="' . $_GET['name'] . '">
+                        <input type="submit" value="Play Again">
+                    </form>
+                ';
+            }
         }
 
     }
