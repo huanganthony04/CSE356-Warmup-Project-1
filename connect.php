@@ -93,14 +93,14 @@
                 echo '
                     <form action="connect.php?name=' . $_GET['name'] . '" method="post">
                         <input type="hidden" name="board" id="board" value="' . $board_str . '">
-                        <input class="drop" type="submit" value="Drop">
+                        <button type="submit">Drop</button>
                     </form>
                 ';
             }
             else {
                 echo '
                     <form class="drop">
-                        <input class="drop" type="submit" value="Drop" disabled>
+                        <button type="submit" disabled>Drop</button>
                     </form>
                 ';
             }
@@ -132,7 +132,7 @@
             echo '
                 <form class="play_again" action="connect.php?name=' . $_GET['name'] . '" method="post">
                     <input type="hidden" name="board" id="board" value=" . . . . ">
-                    <input type="submit" value="Play Again">
+                    <button type="submit">Play Again</button>
                 </form>
             ';
         }
