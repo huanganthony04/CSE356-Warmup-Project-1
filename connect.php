@@ -11,7 +11,7 @@
             }
             else {
                 //Each of the 5 rows is separated by a dot. Every cell of each row is separated by a space.
-                $board = "X .O .X .O X.O O X X X X O";
+                $board = " . . . . ";
             }
             $board_rows = explode(".", $board);
             $board_values = [];
