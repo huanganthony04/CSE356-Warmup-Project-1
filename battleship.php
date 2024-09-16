@@ -215,7 +215,12 @@
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'o';
         }else if($_SESSION['board'][$new_move[0]][$new_move[1]] == 's'){
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
-          
+
+            foreach ($_SESSION['ships'] as $subKey => $subArray) {
+                if ($subArray == [$new_move[0],$new_move[1]] ) {
+                     unset($_SESSION['ships'][$subKey]);
+                }
+           }
         }
         $_SESSION['turns_left']--;
         
@@ -236,12 +241,12 @@
     }
 
     function victory_check(){
-        foreach($_SESSION['ships'] as $ship){
-            if($_SESSION['board'][$ship[0]][$ship[1]] == 's'){
-                return false;
-            }
+        if(count($_SESSION['ships']) == 0){
+            return true;
         }
-        return true;
+        
+        return false;
+        
     }
 
     
