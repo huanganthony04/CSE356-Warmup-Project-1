@@ -215,13 +215,12 @@
         }
         $_SESSION['turns_left']--;
         echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
-        //Victory condition: Eliminated all ships
         if(check_victory() == true){
+            //Victory condition: Eliminated all ships
+
             $_SESSION['game_state'] = game_state::won;
             echo '<h1> You Win! </h1>';
-        }
-
-        if($_SESSION['turns_left'] == 0){
+        }else if($_SESSION['turns_left'] == 0){
             //Loss condition: Ran out of turns
 
             $_SESSION['game_state'] = game_state::over;
