@@ -78,6 +78,7 @@
         $_SESSION['board'] = [];
         $_SESSION['turns_left'] = ceil($GLOBALS['ROWS'] * $GLOBALS['COLS'] * 0.60);
         $_SESSION['game_state'] = game_state::ongoing;
+        $_SESSION['ships'] = [];
 
         for($c = 0; $c < $GLOBALS['ROWS']; $c++){
             $_SESSION['board'][$c] = [];
@@ -131,6 +132,7 @@
 
                 for($i = $x_pos; $i < $x_pos + $ship_length; $i++){
                     $_SESSION['board'][$i][$y_pos] = 's';
+                    $_SESSION['ships'][] = [$i,$y_pos];
                 }
                 return true;
         
@@ -149,6 +151,7 @@
 
                 for($i = $y_pos; $i < $y_pos + $ship_length; $i++){
                     $_SESSION['board'][$x_pos][$i] = 's';
+                    $_SESSION['ships'][] = [$x_pos,$i];
                 }
 
                 return true;
@@ -212,10 +215,11 @@
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'o';
         }else if($_SESSION['board'][$new_move[0]][$new_move[1]] == 's'){
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
+          
         }
         $_SESSION['turns_left']--;
         
-        if(check_victory() == true){
+        if(victory_check()){
             //Victory condition: Eliminated all ships
 
             $_SESSION['game_state'] = game_state::won;
@@ -231,17 +235,16 @@
         session_write_close();
     }
 
-    function check_victory(){
-        for($i = 0; $i < $GLOBALS['ROWS']; $i++){
-            for($j = 0; $j < $GLOBALS['COLS']; $j++){
-                if($_SESSION['board'][$i][$j] == 's'){
-                    return false;
-                }
+    function victory_check(){
+        foreach($_SESSION['ships'] as $ship){
+            if($_SESSION['board'][$ship[0]][$ship[1]] == 's'){
+                return false;
             }
         }
-
         return true;
     }
+
+    
 
 ?>
 <!DOCTYPE html>
