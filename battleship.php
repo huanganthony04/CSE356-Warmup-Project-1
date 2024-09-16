@@ -214,7 +214,7 @@
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
         }
         $_SESSION['turns_left']--;
-        echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
+        
         if(check_victory() == true){
             //Victory condition: Eliminated all ships
 
@@ -225,6 +225,8 @@
 
             $_SESSION['game_state'] = game_state::over;
             echo '<h1> You Lose! </h1>';
+        }else{
+            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
         }
         session_write_close();
     }
