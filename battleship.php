@@ -24,7 +24,7 @@
         if(isset($_POST['name'])){
             $_SESSION['name']= htmlspecialchars($_POST['name']);
         }
-        
+
         if (isset($_SESSION['name'])) {
             $name = $_SESSION['name'];
             $date = date("m-d-Y");
@@ -173,7 +173,10 @@
         $board = $_SESSION['board'];
 
         
-        echo '<table>';
+        echo '
+        <form action="battleship.php" method="post">
+        <table>';
+        
         for($i = 0; $i < $GLOBALS['ROWS']; $i++){
             echo '<tr>';
             for($j = 0; $j < $GLOBALS['COLS']; $j++ ){
@@ -188,9 +191,7 @@
                 }else{
                     //Otherwise, generate a button that allows user to guess a square if the game is ongoing
                     if($_SESSION['game_state'] == game_state::ongoing){
-                        echo '<form action="battleship.php" method="post">
-                        <button type="submit" name="move" id="move" value="' . urlencode("$i,$j") . '" >?</button>
-                        </form>';
+                        echo '<button type="submit" name="move" id="move" value="' . urlencode("$i,$j") . '" >?</button>';
                     }else{
                         if($board[$i][$j] == 's'){
                             echo 'S';
@@ -205,7 +206,8 @@
             
             
         }
-        echo '</table>';
+        echo '</table>
+        </form>';
         
     }
 
