@@ -36,8 +36,15 @@
                 //Handle move
                 handle_new_move();
             }
-            
+            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
 
+            if($_SESSION['game_state'] == game_state::over){
+                echo '<h1> You Lose! </h1>';
+            }
+
+            if($_SESSION['game_state'] == game_state::won){
+                echo '<h1> You Win! </h1>';
+            }
 
             //Render the game
             render_battleship_board();
@@ -78,7 +85,6 @@
         $_SESSION['board'] = [];
         $_SESSION['turns_left'] = ceil($GLOBALS['ROWS'] * $GLOBALS['COLS'] * 0.60);
         $_SESSION['game_state'] = game_state::ongoing;
-        $_SESSION['ships'] = [];
 
         for($c = 0; $c < $GLOBALS['ROWS']; $c++){
             $_SESSION['board'][$c] = [];
@@ -132,7 +138,6 @@
 
                 for($i = $x_pos; $i < $x_pos + $ship_length; $i++){
                     $_SESSION['board'][$i][$y_pos] = 's';
-                    $_SESSION['ships'][] = [$i,$y_pos];
                 }
                 return true;
         
@@ -151,7 +156,6 @@
 
                 for($i = $y_pos; $i < $y_pos + $ship_length; $i++){
                     $_SESSION['board'][$x_pos][$i] = 's';
-                    $_SESSION['ships'][] = [$x_pos,$i];
                 }
 
                 return true;
@@ -215,41 +219,33 @@
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'o';
         }else if($_SESSION['board'][$new_move[0]][$new_move[1]] == 's'){
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
-
-            foreach ($_SESSION['ships'] as $subKey => $subArray) {
-                if ($subArray == [$new_move[0],$new_move[1]] ) {
-                     unset($_SESSION['ships'][$subKey]);
-                }
-           }
         }
         $_SESSION['turns_left']--;
-        
-        if(victory_check()){
-            //Victory condition: Eliminated all ships
 
+        //Victory condition: Eliminated all ships
+        if(check_victory() == true){
             $_SESSION['game_state'] = game_state::won;
-            echo '<h1> You Win! </h1>';
-        }else if($_SESSION['turns_left'] == 0){
+        }
+
+        if($_SESSION['turns_left'] == 0){
             //Loss condition: Ran out of turns
 
             $_SESSION['game_state'] = game_state::over;
-            echo '<h1> You Lose! </h1>';
-        }else{
-            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
         }
         session_write_close();
     }
 
-    function victory_check(){
-        if(count($_SESSION['ships']) == 0){
-            return true;
+    function check_victory(){
+        for($i = 0; $i < $GLOBALS['ROWS']; $i++){
+            for($j = 0; $j < $GLOBALS['COLS']; $j++){
+                if($_SESSION['board'][$i][$j] == 's'){
+                    return false;
+                }
+            }
         }
-        
-        return false;
-        
-    }
 
-    
+        return true;
+    }
 
 ?>
 <!DOCTYPE html>
