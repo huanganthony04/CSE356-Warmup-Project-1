@@ -26,28 +26,20 @@
             echo "<h1>Hello $name, $date</h1>";
             
 
-            //If game is replay, reset the game
+            //If replay is pressed, reset the game
             if(isset($_POST['replay'])){
                 init_game();
             }
             //Check if move is made
-
             if(isset($_POST["move"])) {
                 //Handle move
                 handle_new_move();
             }
             
+            check_game_state();
 
-            check_victory();
+            session_write_close();
             
-            if($_SESSION['game_state'] == game_state::over){
-                echo '<h1> You Lose! </h1>';
-            }else if($_SESSION['game_state'] == game_state::won){
-                echo '<h1> You Win! </h1>';
-            }else{
-                echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
-            }
-
             //Render the game
             render_battleship_board();
 
@@ -223,7 +215,20 @@
         }
         $_SESSION['turns_left']--;
 
-        
+    }
+
+    function check_game_state(){
+        //Victory condition: Eliminated all ships
+        if(check_victory() == true){
+            $_SESSION['game_state'] = game_state::won;
+            echo '<h1>You win!</h1>';
+        }else if($_SESSION['turns_left'] == 0){
+            //Loss condition: Ran out of turns
+            $_SESSION['game_state'] = game_state::over;
+            echo '<h1>You lose!</h1>';
+        }else{
+            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
+        }
     }
 
     function check_victory(){
