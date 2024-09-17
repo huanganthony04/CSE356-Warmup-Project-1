@@ -20,8 +20,13 @@
 
         echo '<h1>Battleship!</h1>';
 
-        if (isset($_POST['name'])) {
-            $name = htmlspecialchars($_POST['name']);
+
+        if(isset($_POST['name'])){
+            $_SESSION['name']= htmlspecialchars($_POST['name']);
+        }
+        
+        if (isset($_SESSION['name'])) {
+            $name = $_SESSION['name'];
             $date = date("m-d-Y");
             echo "<h1>Hello $name, $date</h1>";
             
@@ -38,17 +43,6 @@
             }
             echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
 
-            //Render the game
-            render_battleship_board();
-
-            if($_SESSION['game_state'] !== game_state::ongoing){
-                echo '<form action="battleship.php" method="post">
-                        <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
-                        <input type="hidden" name="replay" id="name" value="yes">
-                        <button type="submit">Play again</button>
-                        </form>';
-            }
-
             if($_SESSION['game_state'] == game_state::over){
                 echo '<h1> You Lose! </h1>';
             }
@@ -56,6 +50,17 @@
             if($_SESSION['game_state'] == game_state::won){
                 echo '<h1> You Win! </h1>';
             }
+
+            //Render the game
+            render_battleship_board();
+
+            if($_SESSION['game_state'] !== game_state::ongoing){
+                echo '<form action="battleship.php" method="post">
+                        <input type="hidden" name="replay" id="name" value="yes">
+                        <button type="submit">Play again</button>
+                        </form>';
+            }
+
         }
         else {
 
@@ -184,9 +189,7 @@
                     //Otherwise, generate a button that allows user to guess a square if the game is ongoing
                     if($_SESSION['game_state'] == game_state::ongoing){
                         echo '<form action="battleship.php" method="post">
-                        <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
-                        <input type="hidden" name="move" id="move" value="' . urlencode("$i,$j") . '">
-                        <button type="submit">?</button>
+                        <button type="submit" name="move" id="move" value="' . urlencode("$i,$j") . '" >?</button>
                         </form>';
                     }else{
                         if($board[$i][$j] == 's'){
