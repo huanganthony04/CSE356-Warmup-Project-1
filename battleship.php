@@ -31,22 +31,13 @@
                 init_game();
             }
             //Check if move is made
+
             if(isset($_POST["move"])) {
                 //Handle move
                 handle_new_move();
             }
             
-            if(victory_check()){
-                //Victory condition: Eliminated all ships
-                $_SESSION['game_state'] = game_state::won;
-                echo '<h1> You Win! </h1>';
-            }else if($_SESSION['turns_left'] == 0){
-                //Loss condition: Ran out of turns
-                $_SESSION['game_state'] = game_state::over;
-                echo '<h1> You Lose! </h1>';
-            }else{
-                echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
-            }
+
 
             //Render the game
             render_battleship_board();
@@ -233,7 +224,19 @@
         }
         $_SESSION['turns_left']--;
         
-        
+        if(victory_check()){
+            //Victory condition: Eliminated all ships
+
+            $_SESSION['game_state'] = game_state::won;
+            echo '<h1> You Win! </h1>';
+        }else if($_SESSION['turns_left'] == 0){
+            //Loss condition: Ran out of turns
+
+            $_SESSION['game_state'] = game_state::over;
+            echo '<h1> You Lose! </h1>';
+        }else{
+            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
+        }
         session_write_close();
     }
 
