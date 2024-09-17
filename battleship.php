@@ -38,14 +38,6 @@
             }
             echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
 
-            if($_SESSION['game_state'] == game_state::over){
-                echo '<h1> You Lose! </h1>';
-            }
-
-            if($_SESSION['game_state'] == game_state::won){
-                echo '<h1> You Win! </h1>';
-            }
-
             //Render the game
             render_battleship_board();
 
@@ -55,6 +47,14 @@
                         <input type="hidden" name="replay" id="name" value="yes">
                         <button type="submit">Play again</button>
                         </form>';
+            }
+
+            if($_SESSION['game_state'] == game_state::over){
+                echo '<h1> You Lose! </h1>';
+            }
+
+            if($_SESSION['game_state'] == game_state::won){
+                echo '<h1> You Win! </h1>';
             }
         }
         else {
