@@ -163,10 +163,10 @@
         echo '</table>';
 
         if($winner == true){
-            echo '<h1> You Win! </h1>';
+            echo '<h2>You win!</h2>';
         }
         else if ($turns_left == 0){
-            echo '<h1> You Lose! </h1>';
+            echo '<h2>You lose!</h2>';
         }
         if($winner == true || $turns_left == 0){
             echo '
