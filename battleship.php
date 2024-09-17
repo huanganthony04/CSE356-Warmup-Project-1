@@ -1,12 +1,5 @@
 <?php
 
-
-    enum game_state {
-        case ongoing;
-        case over ;
-        case won;
-    }
-
     $ROWS = 5;
     $COLS = 7;
 
@@ -14,8 +7,6 @@
         session_start();
     }
     
-
-
     function main() {
 
         echo '<h1>Battleship!</h1>';
@@ -24,43 +15,37 @@
             $name = htmlspecialchars($_POST['name']);
             $date = date("m-d-Y");
             echo "<h1>Hello $name, $date</h1>";
-            
 
-            //If game is replay, reset the game
-            if(isset($_POST['replay'])){
-                init_game();
+            //If the game has not been initialized, or the game has been reset, create a new board
+            if (!isset($_SESSION['board']) || isset($_POST['replay'])) {
+                $_SESSION['board'] = create_new_board();
+                $_SESSION['turns_left'] = ceil($GLOBALS['ROWS'] * $GLOBALS['COLS'] * 0.60);
             }
-            //Check if move is made
 
-            if(isset($_POST["move"])) {
-                //Handle move
-                handle_new_move();
+            //If a move has been provided, update the board with the move
+            if(isset($_POST['move'])){
+                $old_board = $_SESSION['board'];
+                $move = explode(",", urldecode($_POST['move']));
+                $x = $move[0];
+                $y = $move[1];
+
+                if($old_board[$x][$y] == 's'){
+                    $old_board[$x][$y] = 'x';
+                }else{
+                    $old_board[$x][$y] = 'o';
+                }
+                $_SESSION['turns_left']--;
+                $_SESSION['board'] = $old_board;
             }
-            echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
+
+            $board = $_SESSION['board'];
+            $turns_left = $_SESSION['turns_left'];
 
             //Render the game
-            render_battleship_board();
+            render_battleship_board($board, $turns_left);
 
-            if($_SESSION['game_state'] !== game_state::ongoing){
-                echo '<form action="battleship.php" method="post">
-                        <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
-                        <input type="hidden" name="replay" id="name" value="yes">
-                        <button type="submit">Play again</button>
-                        </form>';
-            }
-
-            if($_SESSION['game_state'] == game_state::over){
-                echo '<h1> You Lose! </h1>';
-            }
-
-            if($_SESSION['game_state'] == game_state::won){
-                echo '<h1> You Win! </h1>';
-            }
         }
         else {
-
-            init_game();
-            
             echo '
                 <form class="name" action="battleship.php" method="post">
                         <label for="name">Enter your name:</label>
@@ -74,100 +59,72 @@
     
     }
 
-    function init_game() {
-        //Initalize the game state and store it in the session
-        //GAME INFO
-        // . == empty
-        // s == ship
-        // x == hit
-        // o == miss
+    function create_new_board() {
+        //"" -> empty
+        //"s" -> ship
+        //"x" -> hit
+        //"o" -> miss
+        $new_board = array_fill(0, $GLOBALS['ROWS'], array_fill(0, $GLOBALS['COLS'], ""));
+        $new_board = place_ship($new_board, 2);
+        $new_board = place_ship($new_board, 3);
+        $new_board = place_ship($new_board, 4);
+        return $new_board;
+    }
 
-        $_SESSION['board'] = [];
-        $_SESSION['turns_left'] = ceil($GLOBALS['ROWS'] * $GLOBALS['COLS'] * 0.60);
-        $_SESSION['game_state'] = game_state::ongoing;
-
-        for($c = 0; $c < $GLOBALS['ROWS']; $c++){
-            $_SESSION['board'][$c] = [];
-            for($r = 0; $r < $GLOBALS['COLS']; $r++){
-                $_SESSION['board'][$c][$r] = '.';
+    function place_ship($board, $length) {
+        //0 -> horizontal, 1 -> vertical
+        $direction = rand(0, 1);
+        if ($direction == 0) {
+            //Find all possible places where this ship can go
+            $possible_starts = [];
+            $starts_counter = 0;
+            for($i = 0; $i < $GLOBALS['ROWS']; $i++){
+                for($j = 0; $j < $GLOBALS['COLS'] - $length; $j++){
+                    //Check if the ship can be placed here without overlapping another ship
+                    for($k = $j; $k < $j + $length; $k++){
+                        if($board[$i][$k] != ""){
+                            continue 2;
+                        }
+                    }
+                    $possible_starts[$starts_counter] = [$i, $j];
+                    $starts_counter++;
+                }
+            }
+            $start = $possible_starts[rand(0, $starts_counter - 1)];
+            for($k = $start[1]; $k < $start[1] + $length; $k++){
+                $board[$start[0]][$k] = 's';
+            }
+        }
+        else {
+            //Find all possible places where this ship can go
+            $possible_starts = [];
+            $starts_counter = 0;
+            for($i = 0; $i < $GLOBALS['ROWS'] - $length; $i++){
+                for($j = 0; $j < $GLOBALS['COLS']; $j++){
+                    //Check if the ship can be placed here without overlapping another ship
+                    for($k = $i; $k < $i + $length; $k++){
+                        if($board[$k][$j] != ""){
+                            continue 2;
+                        }
+                    }
+                    $possible_starts[$starts_counter] = [$i, $j];
+                    $starts_counter++;
+                }
+            }
+            $start = $possible_starts[rand(0, $starts_counter - 1)];
+            for($k = $start[0]; $k < $start[0] + $length; $k++){
+                $board[$k][$start[1]] = 's';
             }
         }
 
-        place_ships();
-        session_write_close();
+        return $board;
     }
 
-    function place_ships() {
+    function render_battleship_board($board, $turns_left){
 
-        $ships = [2,3,4];
-        $ship_index = 0;
+        $winner = check_victory();
+        echo '<h1> Moves left: ' . $turns_left . ' </h1>';
 
-        while($ship_index !== 3){
-            $rand_direction = rand(0,1); //0 is vertically down, 1 is horizontial right
-            $rand_x_position = rand(0,4);
-            $rand_y_position = rand(0,6);
-
-            if(attempt_to_place_ship($rand_direction, $rand_x_position, $rand_y_position,$ships[$ship_index]) == true){
-                $ship_index++;
-            }
-        }
-        
-    }
-
-    function attempt_to_place_ship($direction, $x_pos, $y_pos, $ship_length) {
-
-        if($_SESSION['board'][$x_pos][$y_pos] != '.'){
-            return false;
-        }
-
-        switch($direction)
-        {
-            case 0:
-                //Place it vertically, test if placement exceeds the board
-                if($x_pos + $ship_length > $GLOBALS['ROWS']){
-                    return false;
-                }
-
-
-                //Test if the entire space is empty
-                for($i = $x_pos; $i < $x_pos + $ship_length; $i++){
-                    if($_SESSION['board'][$i][$y_pos] != '.'){
-                        return false;
-                    }
-                }
-
-                for($i = $x_pos; $i < $x_pos + $ship_length; $i++){
-                    $_SESSION['board'][$i][$y_pos] = 's';
-                }
-                return true;
-        
-            case 1:
-                //Place it horizontally, test if placement exceeds the board
-                if($y_pos + $ship_length > $GLOBALS['COLS']){
-                    return false;
-                }
-    
-                //Test if the entire space is empty
-                for($i = $y_pos; $i < $y_pos + $ship_length; $i++){
-                    if($_SESSION['board'][$x_pos][$i] != '.'){
-                        return false;
-                    }
-                }
-
-                for($i = $y_pos; $i < $y_pos + $ship_length; $i++){
-                    $_SESSION['board'][$x_pos][$i] = 's';
-                }
-
-                return true;
-
-        }
-    }
-
-    function render_battleship_board(){
-
-        $board = $_SESSION['board'];
-
-        
         echo '<table>';
         for($i = 0; $i < $GLOBALS['ROWS']; $i++){
             echo '<tr>';
@@ -180,21 +137,22 @@
                 }else if($board[$i][$j] == 'o'){
                     //If it is a miss, mark with O
                     echo 'O';
-                }else{
-                    //Otherwise, generate a button that allows user to guess a square if the game is ongoing
-                    if($_SESSION['game_state'] == game_state::ongoing){
-                        echo '<form action="battleship.php" method="post">
-                        <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
-                        <input type="hidden" name="move" id="move" value="' . urlencode("$i,$j") . '">
-                        <button type="submit">?</button>
-                        </form>';
-                    }else{
-                        if($board[$i][$j] == 's'){
-                            echo 'S';
-                        }else{
-                            echo '.';
-                        }
+                }else if($winner == true || $turns_left == 0) {
+                    if($board[$i][$j] == 's'){
+                        echo 'S';
                     }
+                    else {
+                        echo '.';
+                    }
+                }
+                else {
+                    echo '
+                        <form action="battleship.php" method="post">
+                            <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
+                            <input type="hidden" name="move" id="move" value="' . urlencode("$i,$j") . '">
+                            <button type="submit">?</button>
+                        </form>
+                    ';
                 }
                 echo '</td>';
             }
@@ -203,36 +161,23 @@
             
         }
         echo '</table>';
+
+        if($winner == true){
+            echo '<h1> You Win! </h1>';
+        }
+        else if ($turns_left == 0){
+            echo '<h1> You Lose! </h1>';
+        }
+        if($winner == true || $turns_left == 0){
+            echo '
+                <form action="battleship.php" method="post">
+                    <input type="hidden" name="name" id="name" value="' . $_POST['name'] . '">
+                    <input type="hidden" name="replay" id="replay" value="yes">
+                    <button type="submit">Play again</button>
+                </form>
+            ';
+        }
         
-    }
-
-    //Handles a new move and changes the board to reflect the move
-    function handle_new_move(){
-        //GAME INFO
-        // . == empty
-        // s == ship
-        // x == hit
-        // o == miss
-
-        $new_move = explode(',',urldecode($_POST['move']));
-        if($_SESSION['board'][$new_move[0]][$new_move[1]] == '.'){
-            $_SESSION['board'][$new_move[0]][$new_move[1]] = 'o';
-        }else if($_SESSION['board'][$new_move[0]][$new_move[1]] == 's'){
-            $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
-        }
-        $_SESSION['turns_left']--;
-
-        //Victory condition: Eliminated all ships
-        if(check_victory() == true){
-            $_SESSION['game_state'] = game_state::won;
-        }
-
-        if($_SESSION['turns_left'] == 0){
-            //Loss condition: Ran out of turns
-
-            $_SESSION['game_state'] = game_state::over;
-        }
-        session_write_close();
     }
 
     function check_victory(){
@@ -243,7 +188,6 @@
                 }
             }
         }
-
         return true;
     }
 
