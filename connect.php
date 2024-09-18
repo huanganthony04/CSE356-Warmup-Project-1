@@ -76,12 +76,14 @@
 
                     //Get the best possible response
                     $best_move = find_best_move($board_if_clicked, $bmvc_if_clicked);
+                    /*
                     if(!isset($best_move)) {
                         echo 'Error: Best move not found';
                     }
                     else if (!isset($bmvc_if_clicked[$best_move])) {
                         echo 'Error: Best move column not found';
                     }
+                    */
                     $board_if_clicked[$bmvc_if_clicked[$best_move]][$best_move] = "O";
 
                 }
