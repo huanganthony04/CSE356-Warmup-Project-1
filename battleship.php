@@ -44,11 +44,11 @@
             echo '<h1> Moves left: '. $_SESSION['turns_left'] . ' </h1>';
 
             if($_SESSION['game_state'] == game_state::over){
-                echo '<h1> You Lose! </h1>';
+                echo '<h1> You lose! </h1>';
             }
 
             if($_SESSION['game_state'] == game_state::won){
-                echo '<h1> You Win! </h1>';
+                echo '<h1> You win! </h1>';
             }
 
             //Render the game
