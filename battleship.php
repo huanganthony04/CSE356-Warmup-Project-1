@@ -19,6 +19,7 @@
             //If the game has not been initialized, or the game has been reset, create a new board
             if (!isset($_SESSION['board']) || isset($_POST['replay'])) {
                 $_SESSION['board'] = create_new_board();
+                $_SESSION['has_moved_cell'] = array_fill(0, $GLOBALS['ROWS'], array_fill(0, $GLOBALS['COLS'], false));
                 $_SESSION['turns_left'] = ceil($GLOBALS['ROWS'] * $GLOBALS['COLS'] * 0.60);
             }
 
@@ -26,16 +27,24 @@
             if(isset($_POST['move'])){
                 $old_board = $_SESSION['board'];
                 $move = explode(",", urldecode($_POST['move']));
+
                 $x = $move[0];
                 $y = $move[1];
 
-                if($old_board[$x][$y] == 's'){
-                    $old_board[$x][$y] = 'x';
-                }else{
-                    $old_board[$x][$y] = 'o';
+                //Check if the move has been done already
+                if(isset($_SESSION['has_moved_cell'][$x][$y]) && $_SESSION['has_moved_cell'][$x][$y] == true){
+                    //echo '<h2>Move already done!</h2>';
                 }
-                $_SESSION['turns_left']--;
-                $_SESSION['board'] = $old_board;
+                else {
+                    if($old_board[$x][$y] == 's'){
+                        $old_board[$x][$y] = 'x';
+                    }else{
+                        $old_board[$x][$y] = 'o';
+                    }
+                    $_SESSION['turns_left']--;
+                    $_SESSION['has_moved_cell'][$x][$y] = true;
+                    $_SESSION['board'] = $old_board;
+                }
             }
 
             $board = $_SESSION['board'];
