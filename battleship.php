@@ -222,10 +222,11 @@
         $new_move = explode(',',urldecode($_POST['move']));
         if($_SESSION['board'][$new_move[0]][$new_move[1]] == '.'){
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'o';
+            $_SESSION['turns_left']--;
         }else if($_SESSION['board'][$new_move[0]][$new_move[1]] == 's'){
             $_SESSION['board'][$new_move[0]][$new_move[1]] = 'x';
+            $_SESSION['turns_left']--;
         }
-        $_SESSION['turns_left']--;
 
         //Victory condition: Eliminated all ships
         if(check_victory() == true){
