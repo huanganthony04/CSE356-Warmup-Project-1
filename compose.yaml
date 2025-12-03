@@ -1,0 +1,13 @@
+services:
+  php-server:
+    image: php:7.2-apache
+    volumes:
+      - ./html:/var/www/html/
+    ports:
+      - 8080:80
+      - 8443:443
+  # db:
+  #   image: mysql
+  #   restart: always
+  #   ports:
+  #     - 3306:3306
